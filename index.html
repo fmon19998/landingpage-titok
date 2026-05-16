@@ -205,6 +205,8 @@
 
     .main-btn {
       display: flex;
+      font-family: inherit;
+      cursor: pointer;
       align-items: center;
       justify-content: center;
       gap: 10px;
@@ -345,14 +347,9 @@
         </div>
       </div>
 
-      <a
-        class="main-btn"
-        href="https://t.me/pusat_officialbot?start=tiktok"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        🚀 PLAY NOW
-      </a>
+      <button class="main-btn" type="button" onclick="openTelegramBot()">
+        ▶ PLAY NOW
+      </button>
 
       <a
         class="second-btn"
@@ -360,11 +357,11 @@
         target="_blank"
         rel="noopener noreferrer"
       >
-        IMBABOT START
+        Buka Link Cadangan
       </a>
 
       <div class="steps">
-        <div class="step">1. Klik tombol PLAY NOW</div>
+        <div class="step">1. Klik tombol</div>
         <div class="step">2. Buka Telegram</div>
         <div class="step">3. Tekan Start</div>
       </div>
@@ -379,6 +376,16 @@
 
   <script>
     const BOT_USERNAME = '@pusat_officialbot';
+    const BOT_HTTPS_LINK = 'https://t.me/pusat_officialbot?start=tiktok';
+    const BOT_APP_LINK = 'tg://resolve?domain=pusat_officialbot&start=tiktok';
+
+    function openTelegramBot() {
+      window.location.href = BOT_APP_LINK;
+
+      setTimeout(() => {
+        window.location.href = BOT_HTTPS_LINK;
+      }, 900);
+    }
 
     function showToast(message) {
       const toast = document.getElementById('toast');
