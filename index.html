@@ -229,6 +229,8 @@
 
     .second-btn {
       display: flex;
+      font-family: inherit;
+      cursor: pointer;
       align-items: center;
       justify-content: center;
       width: 100%;
@@ -240,6 +242,27 @@
       font-size: 15px;
       font-weight: 800;
       border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .browser-guide {
+      display: none;
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(250, 204, 21, 0.12);
+      border: 1px solid rgba(250, 204, 21, 0.32);
+      color: #fef3c7;
+      font-size: 13px;
+      line-height: 1.55;
+      text-align: left;
+    }
+
+    .browser-guide.show {
+      display: block;
+    }
+
+    .browser-guide b {
+      color: #ffffff;
     }
 
     .note {
@@ -347,18 +370,18 @@
         </div>
       </div>
 
-      <button class="main-btn" type="button" onclick="openTelegramBot()">
-        ▶ PLAY NOW
+      <button class="main-btn" type="button" onclick="openPlayNow()">
+        ▶ PLAY NOW / START IMBABOT
       </button>
 
-      <a
-        class="second-btn"
-        href="https://t.me/pusat_officialbot"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Buka Link Cadangan
-      </a>
+      <button class="second-btn" type="button" onclick="copyBotLink()">
+        📋 Salin Link Bot
+      </button>
+
+      <div class="browser-guide" id="browserGuide">
+        <b>Khusus iPhone / TikTok:</b><br />
+        TikTok tidak mengizinkan halaman ini membuka Safari otomatis. Tekan tombol <b>•••</b> di kanan atas, pilih <b>Buka di browser</b>, lalu klik <b>PLAY NOW</b> lagi.
+      </div>
 
       <div class="steps">
         <div class="step">1. Klik tombol</div>
@@ -376,15 +399,71 @@
 
   <script>
     const BOT_USERNAME = '@pusat_officialbot';
+    const LANDING_URL = 'https://bot.rotihangat.shop/';
     const BOT_HTTPS_LINK = 'https://t.me/pusat_officialbot?start=tiktok';
     const BOT_APP_LINK = 'tg://resolve?domain=pusat_officialbot&start=tiktok';
 
-    function openTelegramBot() {
+    function isTikTokBrowser() {
+      return /TikTok|Bytedance|musical_ly|Aweme/i.test(navigator.userAgent || '');
+    }
+
+    function openPlayNow() {
+      const ua = navigator.userAgent || '';
+      const isAndroid = /Android/i.test(ua);
+      const isIOS = /iPhone|iPad|iPod/i.test(ua);
+
+      if (isTikTokBrowser() && isAndroid) {
+        const chromeIntent =
+          'intent://bot.rotihangat.shop/#Intent;' +
+          'scheme=https;' +
+          'package=com.android.chrome;' +
+          'S.browser_fallback_url=' + encodeURIComponent(LANDING_URL) + ';' +
+          'end';
+
+        window.location.href = chromeIntent;
+
+        setTimeout(() => {
+          showToast('Kalau belum terbuka, tekan ••• lalu buka di browser');
+        }, 1200);
+        return;
+      }
+
+      if (isTikTokBrowser() && isIOS) {
+        copyLandingLink(false);
+        const guide = document.getElementById('browserGuide');
+        if (guide) guide.classList.add('show');
+        showToast('Link disalin. Tekan ••• lalu buka di browser');
+        return;
+      }
+
       window.location.href = BOT_APP_LINK;
 
       setTimeout(() => {
         window.location.href = BOT_HTTPS_LINK;
       }, 900);
+    }
+
+    async function copyText(text, successMessage) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(successMessage);
+      } catch (error) {
+        const tempInput = document.createElement('input');
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        showToast(successMessage);
+      }
+    }
+
+    function copyLandingLink(showMessage = true) {
+      return copyText(LANDING_URL, showMessage ? 'Link landing page berhasil disalin' : 'Link berhasil disalin');
+    }
+
+    function copyBotLink() {
+      return copyText(BOT_HTTPS_LINK, 'Link bot berhasil disalin');
     }
 
     function showToast(message) {
